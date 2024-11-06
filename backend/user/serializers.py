@@ -1,13 +1,14 @@
+from backend.utils import MySerializer
 from rest_framework import serializers
 from .models import User
 from django.contrib.auth.hashers import check_password
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(MySerializer):
     class Meta:
         model = User
         fields = ["name","email","role"]
 
-class LoginSerializer(serializers.Serializer):
+class LoginSerializer(MySerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
