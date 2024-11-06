@@ -1,12 +1,33 @@
-from backend.utils import MySerializer
+from backend.utils import MySerializer,MyModelSerializer
 from rest_framework import serializers
 from .models import User
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 
-class UserSerializer(MySerializer):
+class UserSerializer(MyModelSerializer):
     class Meta:
         model = User
-        fields = ["name","email","role"]
+        fields = ["username", "email", "password", "role"]
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        
+        user = super().create(validated_data)
+        
+        if password:
+            user.password = make_password(password)
+            user.save()
+        
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        
+        instance = super().update(instance, validated_data)
+        
+        if password:
+            instance.password = make_password(password) 
+            instance.save()
+        return instance
 
 class LoginSerializer(MySerializer):
     email = serializers.EmailField()
