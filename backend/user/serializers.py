@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import check_password
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["name","email","created_at","role"]
+        fields = ["name","email","role"]
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
