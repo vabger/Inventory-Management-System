@@ -15,7 +15,6 @@ class AuthenticationMiddleware:
                 user_id = access_token.get('user_id')
                 request.user = User.objects.get(id=user_id)
             except Exception as e:
-                print(e)
                 request.user = AnonymousUser() 
         else:
             request.user = AnonymousUser() 

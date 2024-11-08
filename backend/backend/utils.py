@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.exceptions import ParseError
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import serializers
 from django.db import IntegrityError
 
 def exception_handler(func):
@@ -39,26 +38,6 @@ def exception_handler(func):
             )
     return wrapper
 
-
-class MyModelSerializer(serializers.ModelSerializer):
-
-    def __init__(self, instance=None, data=..., **kwargs):
-        super().__init__(instance, data, **kwargs)
-
-        valid = super().is_valid()
-
-        if not valid:
-            raise ValidationError(self.errors)
-        
-class MySerializer(serializers.Serializer):
-
-    def __init__(self, instance=None, data=..., **kwargs):
-        super().__init__(instance, data, **kwargs)
-
-        valid = super().is_valid()
-
-        if not valid:
-            raise ValidationError(self.errors)
         
 def success_response(message,status = 200,**kwargs):
     response = {"message":message}
