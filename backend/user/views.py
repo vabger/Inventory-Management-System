@@ -4,6 +4,7 @@ from .serializers import LoginSerializer, UserSerializer
 from backend.utils import exception_handler, success_response
 from rest_framework.exceptions import ValidationError
 from .models import User
+from .decorators import admin_required
 
 class LoginView(APIView):
     @exception_handler
@@ -23,6 +24,7 @@ class LoginView(APIView):
 
 class RegisterView(APIView):
     @exception_handler
+    @admin_required
     def post(self,request):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -30,7 +32,7 @@ class RegisterView(APIView):
         User.objects.create_user(
             username=serializer.validated_data['username'],
             email=serializer.validated_data['email'],
-            password=serializer.validated_data['password'],
+            password=serializer.validated_data['password']
         )
 
         return success_response(
