@@ -22,6 +22,8 @@ sudo systemctl start postgresql
 # Enable PostgreSQL to start on boot
 sudo systemctl enable postgresql
 
+
+
 # Set a password for the postgres user
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD '$POSTGRES_PASSWORD';"
 

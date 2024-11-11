@@ -1,42 +1,53 @@
-from functools import wraps
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, PermissionDenied, MethodNotAllowed
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from rest_framework.views import exception_handler
+from rest_framework import status
 
-def exception_handler(func):
-    @wraps(func)
-    def wrapper(request,*args,**kwargs):
-        try:
-            return func(request,*args,**kwargs)
-        except ParseError:
-            return error_response(
-                error="Invalid JSON request body",
-                status=400
-            )
-        except IntegrityError as e:
-            return error_response(
-                error="Invalid object",
-                status=400
-            )
-        except ValidationError as e:
-            return error_response(
-                error=e.detail,
-                status=400
-            )
-        except ObjectDoesNotExist:
-            return error_response(
-                error="Object not found",
-                status=404
-            )
-        except Exception as e:
-            print(e)
-            return error_response(
-                error="Something unexpected happened on the server",
-                status=500
-            )
-    return wrapper
+def custom_exception_handler(exc, context):
+    response = exception_handler(exc, context)
+    print(type(exc))
+    print(exc)
+    if isinstance(exc, ParseError):
+        return error_response(
+            error="Invalid JSON request body",
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    elif isinstance(exc, IntegrityError):
+        return error_response(
+            error="Invalid object",
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    elif isinstance(exc, ValidationError):
+        return error_response(
+            error=exc.detail, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    elif isinstance(exc, ObjectDoesNotExist):
+        return error_response(
+            error="Object not found",
+            status=status.HTTP_404_NOT_FOUND
+        )
+    elif isinstance(exc,PermissionDenied):
+        return error_response(
+            error="You don't have the permission to access this resource",
+            status=status.HTTP_403_FORBIDDEN
+        )
+    elif isinstance(exc,MethodNotAllowed):
+        return error_response(
+            error=exc.detail,
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
+    elif response is None:
+        return error_response(
+            error="Something unexpected happened on the server",
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    return response
+
 
         
 def success_response(message,status = 200,**kwargs):
