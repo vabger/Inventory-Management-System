@@ -10,5 +10,6 @@ urlpatterns = [
     # path("filter",FilterItemView.as_view(),name="filter_item"),
     path("update",UpdateItemView.as_view(),name="update_item"),
     path("barcode", BarcodeView.as_view(),name="barcode"),
+    path("update_quant",UpdateQuantityView.as_view(),name="update_quantity")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -24,8 +24,12 @@ class Item(models.Model):
         help_text="Category of the item"
     )
     image = models.ImageField(upload_to='item_images/', blank=True, null=True)
+    minimum_stock_level = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} (SKU: {self.sku}) - {self.get_category_display()}"
+    
+    def is_below_minimum_stock(self):
+        return self.quantity < self.minimum_stock_level

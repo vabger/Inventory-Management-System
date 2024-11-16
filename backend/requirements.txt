@@ -6,6 +6,7 @@ djangorestframework-simplejwt==5.3.1
 pillow==11.0.0
 psycopg==3.2.3
 PyJWT==2.9.0
+python-barcode==0.15.1
 setuptools==75.1.0
 sqlparse @ file:///work/perseverance-python-buildout/croot/sqlparse_1698874574933/work
 typing_extensions==4.12.2

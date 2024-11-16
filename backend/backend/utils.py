@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from django.core.exceptions import ValidationError
-from rest_framework.exceptions import ParseError, PermissionDenied, MethodNotAllowed, NotFound
+from rest_framework.exceptions import ParseError, PermissionDenied, MethodNotAllowed, NotFound, ValidationError as RestFrameworkValidationError
 from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -25,6 +25,10 @@ def custom_exception_handler(exc, context):
         return error_response(
             error=exc.messages[0], 
             status=status.HTTP_400_BAD_REQUEST
+        )
+    elif isinstance(exc,RestFrameworkValidationError):
+        return error_response(
+            error=exc.detail,
         )
     elif isinstance(exc, ObjectDoesNotExist):
         return error_response(
