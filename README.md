@@ -44,9 +44,28 @@ The Inventory Management System (IMS) helps track and manage inventory levels. I
 
     python manage.py runserver
 
+## FRONTEND SETUP
 
+### Step 1: Setup the react native
 
+    Use this docs
+    https://reactnative.dev/docs/set-up-your-environment
+    select os - linux , target - android
 
+    basically you need to  install 
+    node.js, java jdk, and android studio(for adb and some sdk tools)
 
+### Step 2:Install Dependencies
+    
+    npm install expo-router react-native-screens react-native-safe-area-context
+
+### step 3: Run app
+    Install expo go app for running app on phone
+
+    DO: npm start
+
+    scan the QRcode from expo app
+
+        
 
 
