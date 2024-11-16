@@ -1,6 +1,7 @@
 from rest_framework.response import Response
-from rest_framework.serializers import ValidationError
-from rest_framework.exceptions import ParseError, PermissionDenied, MethodNotAllowed
+from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ParseError, PermissionDenied, MethodNotAllowed, NotFound
+from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from rest_framework.views import exception_handler
@@ -22,7 +23,7 @@ def custom_exception_handler(exc, context):
         )
     elif isinstance(exc, ValidationError):
         return error_response(
-            error=exc.detail, 
+            error=exc.messages[0], 
             status=status.HTTP_400_BAD_REQUEST
         )
     elif isinstance(exc, ObjectDoesNotExist):
@@ -40,6 +41,22 @@ def custom_exception_handler(exc, context):
             error=exc.detail,
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
+    elif isinstance(exc,InvalidToken):
+        return error_response(
+            error=exc.detail,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    elif isinstance(exc,AuthenticationFailed):
+        return error_response(
+            error=exc.detail,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    elif isinstance(exc,NotFound):
+        return error_response(
+            error=exc.detail,
+            status=status.HTTP_404_NOT_FOUND
+        )
+
     elif response is None:
         return error_response(
             error="Something unexpected happened on the server",

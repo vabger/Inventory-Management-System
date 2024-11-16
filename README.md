@@ -18,3 +18,30 @@ The Inventory Management System (IMS) helps track and manage inventory levels. I
 - **Responsive Design**
 - **Real-time Data Sync**
 - **Reusable UI Components**
+
+
+
+## BACKEND SETUP
+
+### Step 1: Install Requirements.txt
+
+    It will install Django, Django rest framework, and other required packages.
+
+### Step 2: Setup Postgres
+
+    ./setup-postgres.sh <password>
+
+### Step 3: Run Migrations
+
+    python manage.py makemigrations
+    python manage.py migrate
+
+### Step 4: Run Server
+
+    python manage.py runserver
+
+
+
+
+
+

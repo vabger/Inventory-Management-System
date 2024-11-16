@@ -33,11 +33,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'username'
-
-    class Meta:
-        permissions = [
-                ("admin_access", "Can access admin routes"),
-            ]
+    REQUIRED_FIELDS = ['email']
 
     def __str__(self):
         return self.email

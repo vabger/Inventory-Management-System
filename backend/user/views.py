@@ -28,7 +28,10 @@ class LoginView(APIView):
             message="Login Successful", 
             status=200, 
             refresh_token=str(refresh_token), 
-            access_token=str(refresh_token.access_token), 
+            access_token=str(refresh_token.access_token),
+            is_staff = user.is_staff,
+            username = user.username,
+            email = user.email
         )
 
 class RegisterView(APIView):
@@ -75,4 +78,5 @@ class UserDeleteView(APIView):
             message="User deleted successfully",
             status=204
         )
+
 

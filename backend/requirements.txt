@@ -1,0 +1,12 @@
+asgiref @ file:///croot/asgiref_1724072470684/work
+Django @ file:///croot/django_1724964382619/work
+django-environ==0.11.2
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.1
+pillow==11.0.0
+psycopg==3.2.3
+PyJWT==2.9.0
+setuptools==75.1.0
+sqlparse @ file:///work/perseverance-python-buildout/croot/sqlparse_1698874574933/work
+typing_extensions==4.12.2
+wheel==0.44.0
