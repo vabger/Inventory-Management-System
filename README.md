@@ -36,9 +36,14 @@ The Inventory Management System (IMS) helps track and manage inventory levels. I
     python manage.py makemigrations
     python manage.py migrate
 
-### Step 4: Run Server
+### Step 4: To create a admin user
+
+    python manage.py createsuperuser
+
+### Step 5: Run Server
 
     python manage.py runserver
+
 
 
 

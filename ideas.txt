@@ -1,4 +1,10 @@
-Email generation to admin safe quantity 
+Email generation to admin safe quantity and the email will have a link with which the admin can go and generate purchase orders
+
+Purchase orders
+
+Sales orders
 
 Logging of changes made by workers for audit purposes
+
+Analysis on the data
 
