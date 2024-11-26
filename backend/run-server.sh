@@ -3,6 +3,6 @@ python manage.py migrate
 
 sudo systemctl start redis
 
-celery -A backend worker --loglevel=info &
+celery -A backend worker --loglevel=info & > /dev/null 
 
-python manage.py runserver
+python manage.py runserver 0.0.0.0:5000

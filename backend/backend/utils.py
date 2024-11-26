@@ -21,6 +21,10 @@ def custom_exception_handler(exc, context):
             error="Invalid object",
             status=status.HTTP_400_BAD_REQUEST
         )
+    elif isinstance(exc, ValueError):
+        return error_response(
+            error=exc.args[0]
+        )
     elif isinstance(exc, ValidationError):
         return error_response(
             error=exc.messages[0], 
