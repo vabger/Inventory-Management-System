@@ -3,10 +3,10 @@ from .models import Item, Location
 
 
 class LocationSerializer(serializers.Serializer):
-    aisle = serializers.CharField(max_length=10, help_text="Aisle identifier, e.g., A1")
-    row = serializers.CharField(max_length=10, help_text="Row identifier, e.g., R1")
-    level = serializers.CharField(max_length=10, help_text="Level identifier, e.g., L2")
-    bin = serializers.CharField(max_length=10, help_text="Bin identifier, e.g., B3")
+    aisle = serializers.CharField(max_length=10)
+    row = serializers.CharField(max_length=10)
+    level = serializers.CharField(max_length=10)
+    bin = serializers.CharField(max_length=10)
 
 class ItemLocationSerializer(serializers.Serializer):
     item_id = serializers.UUIDField()

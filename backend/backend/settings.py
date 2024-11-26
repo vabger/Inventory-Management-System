@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django_celery_results',
     'backend',
     'user',
-    'item'
+    'item',
+    'shipment'
 ]
 
 MIDDLEWARE = [
