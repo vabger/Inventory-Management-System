@@ -41,7 +41,8 @@ The Inventory Management System (IMS) helps track and manage inventory levels. I
     python manage.py createsuperuser
 
 ### Step 5: Run Server
-
+    //set up the ngrock and follow the docs and run on the port 8000
+    ngrok http 8000
     python manage.py runserver
 
 ## FRONTEND SETUP
@@ -56,8 +57,8 @@ The Inventory Management System (IMS) helps track and manage inventory levels. I
     node.js, java jdk, and android studio(for adb and some sdk tools)
 
 ### Step 2:Install Dependencies
-    
-    npm install expo-router react-native-screens react-native-safe-area-context
+    //you can install the Dependencies from the package.json file
+    npm install 
 
 ### step 3: Run app
     Install expo go app for running app on phone

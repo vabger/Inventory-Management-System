@@ -1,162 +1,174 @@
-// app/index.js
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Header from '@/components/Header';
-import { Link } from 'expo-router';
-import { MaterialIcons, FontAwesome5, Entypo } from '@expo/vector-icons';
-import authStore from '@/store/Authstore';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  TextInput,
+  ScrollView,
+} from 'react-native';
+import { observer } from 'mobx-react-lite';
+import { useRouter } from 'expo-router';
+import { BarCodeScanner } from 'expo-barcode-scanner';
+import workerStore from '@/store/WorkerStore';
 
-const Dashboard = () => {
-  const tabs = [
-    {
-      name: 'Insights of Data',
-      route: '/insights',
-      icon: <MaterialIcons name="insights" size={28} color="#f39c12" />,
-      backgroundColor: '#fce4b3',
-    },
-    {
-      name: 'Manage Employees',
-      route: '/employees',
-      icon: <FontAwesome5 name="users-cog" size={28} color="#1abc9c" />,
-      backgroundColor: '#d1f7f5',
-    },
-    {
-      name: 'Create Inventory Report',
-      route: '/reports',
-      icon: <Entypo name="text-document" size={28} color="#9b59b6" />,
-      backgroundColor: '#f4e3fa',
-    },
-    {
-      name: 'Available Items',
-      route: '/items',
-      icon: <MaterialIcons name="inventory" size={28} color="#3498db" />,
-      backgroundColor: '#d9ecfa',
-    },
-    {
-      name: 'Settings',
-      route: '/settings',
-      icon: <MaterialIcons name="settings" size={28} color="#e74c3c" />,
-      backgroundColor: '#fadbd8',
-    },
-    {
-      name: 'Help',
-      route: '/help',
-      icon: <Entypo name="help-with-circle" size={28} color="#34495e" />,
-      backgroundColor: '#d5d8dc',
-    },
-  ];
+const WorkerScreen = observer(() => {
+  const router = useRouter();
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [quantity, setQuantity] = useState('');
+  const [item, setItem] = useState(null);
+
+  // Request permission for the camera
+  const requestCameraPermission = async () => {
+    const { status } = await BarCodeScanner.requestPermissionsAsync();
+    setHasPermission(status === 'granted');
+  };
+
+  // Handle scanning
+  const handleBarCodeScanned = async ({ data }) => {
+    setScanned(true);
+    setBarcode(data);
+
+    try {
+      const itemDetails = await workerStore.fetchItemDetails(data);
+      setItem(itemDetails);
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Failed to fetch item details.');
+    }
+  };
+
+  // Submit updated quantity
+  const handleSubmit = async () => {
+    if (!quantity || isNaN(quantity)) {
+      Alert.alert('Validation Error', 'Please enter a valid quantity!');
+      return;
+    }
+
+    try {
+      await workerStore.updateItemQuantity(item.id, parseInt(quantity));
+      Alert.alert('Success', 'Quantity updated successfully!');
+      setItem(null); // Reset item details
+      setQuantity(''); // Reset quantity
+      setScanned(false); // Allow new scan
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Failed to update quantity.');
+    }
+  };
+
+  // UI for barcode scanner or item details
+  if (!item) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Worker Options</Text>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={requestCameraPermission}
+        >
+          <Text style={styles.buttonText}>Scan Barcode</Text>
+        </TouchableOpacity>
+
+        {hasPermission === null && (
+          <Text style={styles.infoText}>Requesting camera permission...</Text>
+        )}
+
+        {hasPermission === false && (
+          <Text style={styles.infoText}>Camera access denied.</Text>
+        )}
+
+        {hasPermission && (
+          <BarCodeScanner
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            style={StyleSheet.absoluteFillObject}
+          />
+        )}
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <Header style={styles.header} />
-      <Text style={styles.title}>Hi, {authStore.username}!</Text>
-      <Text style={styles.subtitle}>What would you like to do today?</Text>
-      <Text style={styles.title}>Tools</Text>
-      <View style={styles.grid}>
-        {tabs.map((tab, idx) => (
-          <Link key={idx} href={tab.route} style={[styles.tab, { backgroundColor: tab.backgroundColor }]}>
-            <View style={styles.iconContainer}>{tab.icon}</View>
-            <Text>{"\n"}</Text>
-            <Text style={styles.tabText}>{tab.name}</Text>
-          </Link>
-        ))}
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Item Details</Text>
+      <View style={styles.itemDetails}>
+        <Text style={styles.label}>Name: {item.name}</Text>
+        <Text style={styles.label}>SKU: {item.sku}</Text>
+        <Text style={styles.label}>Category: {item.category}</Text>
+        <Text style={styles.label}>Price: ${item.price}</Text>
+        <Text style={styles.label}>Current Quantity: {item.quantity}</Text>
       </View>
-    </View>
+
+      {/* Input field below item details */}
+      <TextInput
+        style={styles.input}
+        placeholder="Enter New Quantity"
+        value={quantity}
+        onChangeText={setQuantity}
+        keyboardType="number-pad"
+      />
+
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Update Quantity</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f8f8f8', // Light grey background for the dashboard
+    flexGrow: 1,
+    padding: 20,
+    justifyContent: 'flex-start',
+    backgroundColor: '#f8f8f8',
   },
-
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#34495e', // Dark grey text
-    marginHorizontal: 20,
-    marginTop: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#7f8c8d', // Soft grey text
-    marginHorizontal: 20,
+    color: '#2c3e50',
+    textAlign: 'center',
     marginBottom: 20,
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 15,
-  },
-  tab: {
-    width: '45%',
-    margin: '2.5%',
-    height: 120,
-    borderRadius: 16,
-    justifyContent: 'center',
+  button: {
+    backgroundColor: '#3498db',
+    padding: 15,
+    borderRadius: 8,
     alignItems: 'center',
-    elevation: 4, // Android shadow
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 2 }, // iOS shadow
-    shadowOpacity: 0.2, // iOS shadow
-    shadowRadius: 4, // iOS shadow
-    flexDirection: 'column', // Stack items vertically
-    padding: 10, // Add padding for better spacing
-    backgroundColor: '#ffffff', // Ensure a clean background
+    marginVertical: 10,
   },
-  iconContainer: {
-    marginBottom: 10, // Add space between icon and text
-    alignItems: 'center', // Center the icon
-    justifyContent: 'center',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#f8f8f8', // Add a light background for the icon
-    elevation: 2, // Android shadow for icons
-    shadowColor: '#000', // iOS shadow for icons
-    shadowOffset: { width: 0, height: 1 }, // iOS shadow for icons
-    shadowOpacity: 0.15, // iOS shadow for icons
-    shadowRadius: 2, // iOS shadow for icons
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  tab: {
-    width: '45%',
-    margin: '2.5%',
-    height: 120,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4, // Android shadow
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 2 }, // iOS shadow
-    shadowOpacity: 0.2, // iOS shadow
-    shadowRadius: 4, // iOS shadow
-    flexDirection: 'column', // Stack items vertically
-    padding: 10, // Add padding for better spacing
-    backgroundColor: '#ffffff', // Ensure a clean background
-  },
-  iconContainer: {
-    marginBottom: 10, // Add space between icon and text
-    alignItems: 'center', // Center the icon
-    justifyContent: 'center',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#f8f8f8', // Add a light background for the icon
-    elevation: 2, // Android shadow for icons
-    shadowColor: '#000', // iOS shadow for icons
-    shadowOffset: { width: 0, height: 1 }, // iOS shadow for icons
-    shadowOpacity: 0.15, // iOS shadow for icons
-    shadowRadius: 2, // iOS shadow for icons
-  },
-  tabText: {
-    color: '#2c3e50', // Dark grey text for tab labels
-    fontSize: 14,
-    fontWeight: '600',
+  infoText: {
+    color: '#aaa',
     textAlign: 'center',
+    marginTop: 10,
   },
-
-
+  itemDetails: {
+    marginVertical: 20,
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  label: {
+    fontSize: 16,
+    marginVertical: 5,
+    color: '#2c3e50',
+  },
+  input: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 15,
+    fontSize: 16,
+  },
 });
 
-export default Dashboard;
+export default WorkerScreen;

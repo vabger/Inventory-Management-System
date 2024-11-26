@@ -6,10 +6,15 @@ import { observer } from 'mobx-react-lite';
 const UserCard = observer(({ user, onEdit, onDelete }: any) => (
     <View style={styles.card}>
         <Text style={styles.username}>{user.username}</Text>
-        <Text>{user.email}</Text>
-        <View style={styles.buttons}>
-            <Button title="Delete" onPress={() => onDelete(user.id)} color="red" />
-        </View>
+        <Text>Email: {user.email}</Text>
+        <Text>Role: {user.is_staff ? 'Admin' : 'Worker'}</Text>
+
+        {!user.is_staff && (
+            <View style={styles.buttons}>
+                <Button title="Delete" onPress={() => onDelete(user.id)} color="red" />
+            </View>
+        )}
+
     </View>
 ));
 
