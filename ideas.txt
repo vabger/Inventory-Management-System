@@ -8,3 +8,33 @@ Logging of changes made by workers for audit purposes
 
 Analysis on the data
 
+
+/shipment/inbound
+
+{
+    "id"
+    "type" = Inbound
+    "items" = [
+        {
+            "item_id"
+            "received_quantity"
+            "location"
+        }
+    ]
+}
+
+/shipment/outbound
+{
+    "id"
+    "type" = Outbound
+    "items" = [
+        {
+            "item_id"
+            "total_quntity"
+            "required_quantity"
+            "location"
+        }
+
+    ]
+}
+
