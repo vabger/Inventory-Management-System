@@ -11,7 +11,7 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 class DeleteSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
+    user_id = serializers.UUIDField()
     
     
 
