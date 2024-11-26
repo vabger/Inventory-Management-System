@@ -1,29 +1,28 @@
-// store/ItemStore.js
 import { types, flow } from 'mobx-state-tree';
 import { BASE_URL } from '@/constants/url';
 import authStore from './Authstore';
 
 const Item = types.model('Item', {
-    id: types.maybeNull(types.identifier),
+    id: types.identifier, // Server-generated ID
     name: types.string,
     description: types.maybeNull(types.string),
-    quantity: types.number,
+    total_quantity: types.number, // Updated field name
     price: types.string,
     sku: types.string,
     category: types.maybeNull(types.string),
     image: types.maybeNull(types.string),
     minimum_stock_level: types.number,
+    item_locations: types.array(types.frozen()), // Flexible structure for item locations
 });
 
 const ItemStore = types
     .model('ItemStore', {
-        items: types.array(Item),
-        loading: types.optional(types.boolean, false),
+        items: types.array(Item), // Array of items
+        loading: types.optional(types.boolean, false), // Loading state
     })
     .actions((self) => ({
         fetchItems: flow(function* () {
             try {
-
                 const accessToken = authStore.accessToken;
                 self.loading = true;
 
@@ -35,12 +34,32 @@ const ItemStore = types
                     },
                 });
 
-                const data = yield response.json();
-                self.items = data;
-                console.log("fetch item response " + response.status)
+                if (response.status === 200) {
+                    const data = yield response.json();
+                    console.log('Fetched items:', data);
+                    self.loading = true
+                    // Transform data if needed
+                    self.items = data.map((item) => ({
+                        id: item.id,
+                        name: item.name,
+                        description: item.description || null,
+                        total_quantity: item.total_quantity,
+                        price: item.price,
+                        sku: item.sku,
+                        category: item.category || null,
+                        image: item.image || null,
+                        minimum_stock_level: item.minimum_stock_level,
+                        item_locations: item.item_locations || [],
+                    }));
 
+                } else {
+                    const errorData = yield response.json();
+                    throw new Error(errorData.message || 'Failed to fetch items.');
+                }
             } catch (error) {
                 console.error('Failed to fetch items:', error);
+            } finally {
+                self.loading = false;
             }
         }),
 
@@ -56,22 +75,22 @@ const ItemStore = types
                     },
                     body: JSON.stringify(itemData),
                 });
-                console.log('add item response status:', response.status);
+
                 if (response.status === 201) {
                     const data = yield response.json();
                     console.log('Item added successfully:', data);
 
-                    // Add the item returned by the server
                     const newItem = {
-                        id: data.id, // Use server-generated ID
+                        id: data.id,
                         name: data.name,
-                        description: data.description,
-                        quantity: data.quantity,
+                        description: data.description || null,
+                        total_quantity: data.total_quantity,
                         price: data.price,
                         sku: data.sku,
                         category: data.category || null,
                         image: data.image || null,
                         minimum_stock_level: data.minimum_stock_level,
+                        item_locations: data.item_locations || [],
                     };
 
                     self.items.push(newItem);
@@ -86,7 +105,6 @@ const ItemStore = types
             }
         }),
 
-
         deleteItem: flow(function* (id) {
             try {
                 const accessToken = authStore.accessToken;
@@ -97,17 +115,14 @@ const ItemStore = types
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${accessToken}`,
                     },
-
                 });
 
-                console.log("delete item response " + response.status)
-
                 if (response.status === 200) {
-                    yield self.fetchItems();
-                    console.log(self.items[0])
+                    console.log('Item deleted successfully');
+                    yield self.fetchItems(); // Refresh the item list
                 } else {
                     const errorData = yield response.json();
-                    throw new Error(errorData.message || 'Failed to delete user.');
+                    throw new Error(errorData.message || 'Failed to delete item.');
                 }
             } catch (error) {
                 console.error('Failed to delete item:', error);
@@ -115,5 +130,5 @@ const ItemStore = types
         }),
     }));
 
-const itemStore = ItemStore.create()
+const itemStore = ItemStore.create();
 export default itemStore;

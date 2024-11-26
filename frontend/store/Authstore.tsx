@@ -44,9 +44,11 @@ const AuthStore = types
                     console.log("Access token expires at:", self.accessTokenExpiresAt);
 
                     ToastAndroid.show("Login successful", ToastAndroid.SHORT);
-                    if (!self.is_staff === true) {
+                    if (self.is_staff === true) {
+                        console.log("from ture")
                         router.replace("/(tabs)/home");
                     } else {
+                        console.log("from false")
                         router.replace("/(worker)/home");
                     }
                 } else {

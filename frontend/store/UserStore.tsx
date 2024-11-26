@@ -82,12 +82,14 @@ const UserStore = types
                 console.log("Delete user endpoint status: " + response.status);
 
                 if (response.status === 200) {
+                    console.log("status: " + response.status);
                     yield self.fetchUsers();
                 } else {
                     const errorData = yield response.json();
                     throw new Error(errorData.message || 'Failed to delete user.');
                 }
             } catch (error) {
+                yield self.fetchUsers();
                 console.error('Failed to delete user:', error);
             }
         }),

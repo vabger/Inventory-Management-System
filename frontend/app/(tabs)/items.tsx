@@ -27,10 +27,9 @@ const ItemListScreen = observer(() => {
     const renderItem = ({ item }) => (
         <View style={styles.card}>
             <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemDetails}>SKU: {item.sku}</Text>
             <Text style={styles.itemDetails}>Price: ${item.price}</Text>
             <Text style={styles.itemDetails}>Category: {item.category}</Text>
-            <Text style={styles.itemDetails}>Quantity: {item.quantity}</Text>
+            <Text style={styles.itemDetails}>Quantity: {item.total_quantity}</Text>
             <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={() => handleDelete(item.id)}
@@ -42,28 +41,23 @@ const ItemListScreen = observer(() => {
     console.log("first item : " + itemStore.items[0])
     return (
         <>
-            <Header />{itemStore.loading === true ?
-                (
-                    <View style={styles.container}>
-                        <FlatList
-                            data={itemStore.items}
-                            keyExtractor={(item) => item.id}
-                            renderItem={renderItem}
-                            contentContainerStyle={styles.list}
-                        />
-                        <TouchableOpacity
-                            style={styles.floatingButton}
-                            onPress={() => {
-                                router.push("/(tabs)/AddItemScreen")
-                            }}
-                        >
-                            <MaterialIcons name="add" size={30} color="#fff" />
-                        </TouchableOpacity>
-                    </View>
-                ) :
-                (<Text>loading...</Text>)
-            }
-
+            <Header />
+            <View style={styles.container}>
+                <FlatList
+                    data={itemStore.items}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.list}
+                />
+                <TouchableOpacity
+                    style={styles.floatingButton}
+                    onPress={() => {
+                        router.push("/(tabs)/AddItemScreen")
+                    }}
+                >
+                    <MaterialIcons name="add" size={30} color="#fff" />
+                </TouchableOpacity>
+            </View>
         </>
 
     );

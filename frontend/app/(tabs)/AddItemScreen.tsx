@@ -3,14 +3,14 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView,
 import { observer } from 'mobx-react-lite';
 import itemStore from '@/store/ItemStore';
 
-const categories = ['Electronics', 'Furniture', 'Clothing', 'Books', 'Toys']; // Predefined categories
+const categories = ['Electronics', 'Furniture', 'Clothing', 'Groceries', 'Books', 'Toys', 'Others']; // Predefined categories
 
 const AddItemScreen = observer(() => {
 
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [quantity, setQuantity] = useState('');
+    const [total_quantity, setQuantity] = useState('');
     const [price, setPrice] = useState('');
     const [sku, setSku] = useState('');
     const [category, setCategory] = useState('');
@@ -18,12 +18,12 @@ const AddItemScreen = observer(() => {
     const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
 
     const handleSubmit = async () => {
-        if (!name || !quantity || !price || !sku || !minimumStockLevel) {
+        if (!name || !total_quantity || !price || !sku || !minimumStockLevel) {
             Alert.alert('Validation Error', 'Please fill all required fields!');
             return;
         }
 
-        if (isNaN(quantity) || isNaN(minimumStockLevel)) {
+        if (parseInt(total_quantity) < 0 || isNaN(minimumStockLevel)) {
             Alert.alert('Validation Error', 'Quantity and Minimum Stock Level must be valid numbers!');
             return;
         }
@@ -36,7 +36,7 @@ const AddItemScreen = observer(() => {
         const newItem = {
             name,
             description: description || null,
-            quantity: parseInt(quantity),
+            total_quantity: parseInt(total_quantity),
             price: parseFloat(price).toFixed(2),
             sku,
             categories,
@@ -65,7 +65,7 @@ const AddItemScreen = observer(() => {
 
             <TextInput style={styles.input} placeholder="Name *" value={name} onChangeText={setName} />
             <TextInput style={styles.input} placeholder="Description" value={description} onChangeText={setDescription} />
-            <TextInput style={styles.input} placeholder="Quantity *" value={quantity} onChangeText={setQuantity} keyboardType="number-pad" />
+            <TextInput style={styles.input} placeholder="Quantity *" value={total_quantity} onChangeText={setQuantity} keyboardType="number-pad" />
             <TextInput style={styles.input} placeholder="Price *" value={price} onChangeText={setPrice} keyboardType="decimal-pad" />
             <TextInput style={styles.input} placeholder="SKU *" value={sku} onChangeText={setSku} />
 
