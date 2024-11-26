@@ -1,39 +1,31 @@
-import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    Alert,
-    TextInput,
-    ScrollView,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, TextInput, ScrollView } from 'react-native';
+import { Camera } from 'expo-camera';
 import { observer } from 'mobx-react-lite';
-import { useRouter } from 'expo-router';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import workerStore from '@/store/WorkerStore';
+import itemStore from '@/store/ItemStore';
 
 const WorkerScreen = observer(() => {
-    const router = useRouter();
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
     const [barcode, setBarcode] = useState('');
     const [quantity, setQuantity] = useState('');
     const [item, setItem] = useState(null);
 
-    // Request permission for the camera
-    const requestCameraPermission = async () => {
-        const { status } = await BarCodeScanner.requestPermissionsAsync();
-        setHasPermission(status === 'granted');
-    };
+    // Request camera permission
+    useEffect(() => {
+        (async () => {
+            const { status } = await Camera.requestCameraPermissionsAsync();
+            setHasPermission(status === 'granted');
+        })();
+    }, []);
 
-    // Handle scanning
+    // Handle barcode scanning
     const handleBarCodeScanned = async ({ data }) => {
         setScanned(true);
         setBarcode(data);
 
         try {
-            const itemDetails = await workerStore.fetchItemDetails(data);
+            const itemDetails = await itemStore.fetchItemDetails(data);
             setItem(itemDetails);
         } catch (error) {
             Alert.alert('Error', error.message || 'Failed to fetch item details.');
@@ -48,7 +40,7 @@ const WorkerScreen = observer(() => {
         }
 
         try {
-            await workerStore.updateItemQuantity(item.id, parseInt(quantity));
+            await itemStore.updateQuantity(item.id, parseInt(quantity));
             Alert.alert('Success', 'Quantity updated successfully!');
             setItem(null); // Reset item details
             setQuantity(''); // Reset quantity
@@ -58,32 +50,47 @@ const WorkerScreen = observer(() => {
         }
     };
 
-    // UI for barcode scanner or item details
+    if (hasPermission === null) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.infoText}>Requesting camera permission...</Text>
+            </View>
+        );
+    }
+
+    if (hasPermission === false) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.infoText}>No access to camera</Text>
+                <TouchableOpacity style={styles.button} onPress={() => Camera.requestCameraPermissionsAsync()}>
+                    <Text style={styles.buttonText}>Request Permission</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    // Render camera or item details
     if (!item) {
         return (
             <View style={styles.container}>
-                <Text style={styles.title}>Worker Options</Text>
-
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={requestCameraPermission}
+                <Camera
+                    style={styles.camera}
+                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                    barCodeScannerSettings={{
+                        barCodeTypes: ['qr', 'ean13', 'ean8', 'upc_a', 'upc_e', 'code39', 'code128'],
+                    }}
                 >
-                    <Text style={styles.buttonText}>Scan Barcode</Text>
-                </TouchableOpacity>
-
-                {hasPermission === null && (
-                    <Text style={styles.infoText}>Requesting camera permission...</Text>
-                )}
-
-                {hasPermission === false && (
-                    <Text style={styles.infoText}>Camera access denied.</Text>
-                )}
-
-                {hasPermission && (
-                    <BarCodeScanner
-                        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                        style={StyleSheet.absoluteFillObject}
-                    />
+                    <View style={styles.cameraOverlay}>
+                        <Text style={styles.infoText}>Scan a barcode</Text>
+                    </View>
+                </Camera>
+                {scanned && (
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => setScanned(false)} // Reset scanning
+                    >
+                        <Text style={styles.buttonText}>Scan Again</Text>
+                    </TouchableOpacity>
                 )}
             </View>
         );
@@ -122,6 +129,16 @@ const styles = StyleSheet.create({
         padding: 20,
         justifyContent: 'flex-start',
         backgroundColor: '#f8f8f8',
+    },
+    camera: {
+        flex: 1,
+        width: '100%',
+    },
+    cameraOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     title: {
         fontSize: 24,
