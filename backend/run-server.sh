@@ -5,4 +5,4 @@ sudo systemctl start redis
 
 celery -A backend worker --loglevel=info & > /dev/null
 
-python manage.py runserver 0.0.0.0:8000
+python manage.py runserver localhost:8000
