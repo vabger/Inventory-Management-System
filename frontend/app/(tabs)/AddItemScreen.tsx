@@ -43,12 +43,8 @@ const AddItemScreen = observer(() => {
             minimum_stock_level: parseInt(minimumStockLevel),
         };
 
-        try {
-            await itemStore.addItem(newItem);
-            Alert.alert('Success', 'Item added successfully!');
-        } catch (error) {
-            Alert.alert('Error', error.message || 'Failed to add item. Please try again.');
-        }
+        itemStore.addItem(newItem);
+
     };
 
     const openCategoryDrawer = () => setCategoryModalVisible(true);

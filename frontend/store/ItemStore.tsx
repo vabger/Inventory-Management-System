@@ -1,6 +1,7 @@
 import { types, flow } from 'mobx-state-tree';
 import { BASE_URL } from '@/constants/url';
 import authStore from './Authstore';
+import { Alert } from 'react-native';
 
 const Item = types.model('Item', {
     id: types.identifier, // Server-generated ID
@@ -93,15 +94,15 @@ const ItemStore = types
                         item_locations: data.item_locations || [],
                     };
 
+                    Alert.alert('Success', 'Item added successfully!');
+
                     self.items.push(newItem);
                 } else {
                     const errorData = yield response.json();
-                    console.error('Error adding item:', errorData);
-                    throw new Error(errorData.message || 'Failed to add item.');
+                    Alert.alert('Error', errorData.error[0] || 'Failed to add item. Please try again.');
                 }
             } catch (error) {
-                console.error('Failed to add item:', error);
-                throw error;
+                console.error('Failed to add item:', error.error);
             }
         }),
 

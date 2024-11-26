@@ -8,23 +8,12 @@ import authStore from '@/store/Authstore';
 
 const Dashboard = () => {
   const tabs = [
-    {
-      name: 'Insights of Data',
-      route: '/insights',
-      icon: <MaterialIcons name="insights" size={28} color="#f39c12" />,
-      backgroundColor: '#fce4b3',
-    },
+
     {
       name: 'Manage Employees',
       route: '/employees',
       icon: <FontAwesome5 name="users-cog" size={28} color="#1abc9c" />,
       backgroundColor: '#d1f7f5',
-    },
-    {
-      name: 'Create Inventory Report',
-      route: '/reports',
-      icon: <Entypo name="text-document" size={28} color="#9b59b6" />,
-      backgroundColor: '#f4e3fa',
     },
     {
       name: 'Manage Items',
