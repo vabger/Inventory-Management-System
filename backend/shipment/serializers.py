@@ -1,12 +1,25 @@
 from rest_framework import serializers
 from .models import Shipment, ShipmentItem
-from item.serializers import LocationSerializer
+from item.serializers import LocationSerializer,ItemSerializer
 
 class ShipmentItemSerializer(serializers.ModelSerializer):
     location = LocationSerializer(read_only=True)
     class Meta:
         model = ShipmentItem
         fields = ['item', 'quantity','location']
+
+class ShipmentItemResponseSerializer(serializers.ModelSerializer):
+    item = ItemSerializer()
+    location = LocationSerializer()
+    class Meta:
+        model = ShipmentItem
+        fields = ['item', 'quantity','location']
+
+class ShipmentResponseSerializer(serializers.ModelSerializer):
+    items = ShipmentItemResponseSerializer(many=True, read_only=True)
+    class Meta:
+        model = Shipment
+        fields = ['id', 'type', 'status', 'created_by', 'assigned_to', 'created_at', 'updated_at', 'items']
 
 class ShipmentSerializer(serializers.ModelSerializer):
     items = ShipmentItemSerializer(many=True, required=True)

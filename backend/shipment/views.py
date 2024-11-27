@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework.permissions import IsAdminUser
 from .models import Shipment
-from .serializers import ShipmentSerializer
+from .serializers import ShipmentSerializer,ShipmentResponseSerializer
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 
@@ -45,7 +45,7 @@ class ShipmentListCreateView(APIView):
     permission_classes = [IsAdminUser]
     def get(self, request):
         shipments = Shipment.objects.all()
-        serializer = ShipmentSerializer(shipments, many=True)
+        serializer = ShipmentResponseSerializer(shipments,many=True)
         return success_response(message="List of Shipments",shipments=serializer.data)
 
     def post(self, request):
@@ -94,7 +94,7 @@ class AssignShipmentToWorkerView(APIView):
 
         return success_response(
             message="Shipment assigned to worker successfully.",
-            shipment=ShipmentSerializer(shipment).data
+            shipment=ShipmentResponseSerializer(shipment).data
         )
 
 
@@ -107,7 +107,7 @@ class WorkerAssignedShipmentsView(APIView):
         worker = request.user
   
         shipments = Shipment.objects.filter(assigned_to=worker).order_by('-created_at')
-        serializer = ShipmentSerializer(shipments, many=True)
+        serializer = ShipmentResponseSerializer(shipments,many=True)
         return success_response(message="List of assigned shipments", shipments=serializer.data)
 
 
@@ -132,7 +132,7 @@ class CompleteShipmentView(APIView):
 
             return success_response(
                 message="Shipment completed successfully.",
-                shipment=ShipmentSerializer(shipment).data
+                shipment=ShipmentResponseSerializer(shipment).data
             )
 
 class DeleteShipmentView(APIView):
@@ -170,7 +170,7 @@ class InProgressShipmentView(APIView):
 
         return success_response(
             message="Shipment marked as in progress successfully.",
-            shipment=ShipmentSerializer(shipment).data
+            shipment=ShipmentResponseSerializer(shipment).data
         )
         
 

@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Check for required argument
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <password>"
+if [ $# -ne 3 ]; then
+    echo "Usage: $0 <db_name> <db_user_name> <db_user_password>"
     exit 1
 fi
 
 # Set variables
-POSTGRES_PASSWORD=$1  # Fixed the parameter index to match the usage statement
-DB_NAME="ims_db"
-USER_NAME="admin"
+POSTGRES_PASSWORD=$3
+DB_NAME=$1
+USER_NAME=$2
 USER_PASSWORD=$POSTGRES_PASSWORD 
 
 # Update package list and install PostgreSQL
@@ -18,16 +18,11 @@ sudo apt install -y postgresql postgresql-contrib
 
 # Start PostgreSQL service
 sudo systemctl start postgresql
-
-# Enable PostgreSQL to start on boot
 sudo systemctl enable postgresql
 
 
 
-# Set a password for the postgres user
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD '$POSTGRES_PASSWORD';"
-
-# Create a new database
 sudo -u postgres createdb "$DB_NAME"
 
 # Create a new user with a password and grant privileges on the database
