@@ -20,7 +20,12 @@ const Index = observer(() => {
     useEffect(() => {
         if (isReady) {
             if (authStore.isLoggedIn) {
-                router.replace("/home"); // Redirect to Home if logged in
+                if (authStore.is_staff === true) {
+                    router.replace("/(tabs)/home");
+                } else {
+                    router.replace("/(tabs)/wokerHome");
+                }
+                // Redirect to Home if logged in
             } else {
                 router.replace("/login"); // Redirect to Login if not logged in
             }

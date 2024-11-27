@@ -13,6 +13,7 @@ import { observer } from 'mobx-react-lite';
 import shipmentStore from '@/store/ShipmentStore';
 import userStore from '@/store/UserStore';
 import { useRouter } from 'expo-router';
+import itemStore from '@/store/ItemStore';
 
 const ShipmentScreen = observer(() => {
     const router = useRouter();
@@ -22,6 +23,7 @@ const ShipmentScreen = observer(() => {
     useEffect(() => {
         shipmentStore.fetchShipments();
         userStore.fetchUsers(); // Preload users
+        itemStore.fetchItems();
     }, []);
 
     const handleAssignWorker = (shipmentId) => {

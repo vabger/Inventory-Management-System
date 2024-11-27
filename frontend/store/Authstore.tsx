@@ -49,7 +49,7 @@ const AuthStore = types
                         router.replace("/(tabs)/home");
                     } else {
                         console.log("from false")
-                        router.replace("/(worker)/home");
+                        router.replace("/(tabs)/wokerHome");
                     }
                 } else {
                     ToastAndroid.show("Invalid credentials", ToastAndroid.SHORT);

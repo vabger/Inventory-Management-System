@@ -66,7 +66,7 @@ const CreateShipmentScreen = observer(() => {
         try {
             await shipmentStore.createShipment(shipmentData);
             Alert.alert('Success', 'Shipment created successfully!');
-            router.push('/shipment-screen'); // Navigate back to shipment list
+            router.push('/shipments'); // Navigate back to shipment list
         } catch (error) {
             Alert.alert('Error', error.message || 'Failed to create shipment.');
         }

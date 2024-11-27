@@ -61,7 +61,6 @@ const AddItemScreen = observer(() => {
 
             <TextInput style={styles.input} placeholder="Name *" value={name} onChangeText={setName} />
             <TextInput style={styles.input} placeholder="Description" value={description} onChangeText={setDescription} />
-            <TextInput style={styles.input} placeholder="Quantity *" value={total_quantity} onChangeText={setQuantity} keyboardType="number-pad" />
             <TextInput style={styles.input} placeholder="Price *" value={price} onChangeText={setPrice} keyboardType="decimal-pad" />
             <TextInput style={styles.input} placeholder="SKU *" value={sku} onChangeText={setSku} />
 
